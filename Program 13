@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_RECORDS 100
+
+struct Employee {
+    int id;
+    char name[50];
+    float salary;
+};
+
+void addEmployee(FILE* file, int id, const char* name, float salary) {
+    struct Employee emp;
+    emp.id = id;
+    strcpy(emp.name, name);
+    emp.salary = salary;
+
+    fseek(file, (emp.id - 1) * sizeof(struct Employee), SEEK_SET);
+    fwrite(&emp, sizeof(struct Employee), 1, file);
+}
+
+void displayEmployee(FILE* file, int id) {
+    struct Employee emp;
+
+    fseek(file, (id - 1) * sizeof(struct Employee), SEEK_SET);
+    fread(&emp, sizeof(struct Employee), 1, file);
+
+    if (emp.id == 0) {
+        printf("Employee not found.\n");
+    } else {
+        printf("ID: %d\nName: %s\nSalary: %.2f\n", emp.id, emp.name, emp.salary);
+    }
+}
+
+void updateEmployee(FILE* file, int id, const char* name, float salary) {
+    struct Employee emp;
+
+    fseek(file, (id - 1) * sizeof(struct Employee), SEEK_SET);
+    fread(&emp, sizeof(struct Employee), 1, file);
+
+    if (emp.id == 0) {
+        printf("Employee not found.\n");
+    } else {
+        strcpy(emp.name, name);
+        emp.salary = salary;
+
+        fseek(file, (id - 1) * sizeof(struct Employee), SEEK_SET);
+        fwrite(&emp, sizeof(struct Employee), 1, file);
+    }
+}
+
+void deleteEmployee(FILE* file, int id) {
+    struct Employee emp;
+    emp.id = 0;
+
+    fseek(file, (id - 1) * sizeof(struct Employee), SEEK_SET);
+    fwrite(&emp, sizeof(struct Employee), 1, file);
+}
+
+int main() {
+    FILE* file = fopen("employee_data.dat", "r+");
+
+    if (file == NULL) {
+        file = fopen("employee_data.dat", "w+");
+    }
+
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return 1;
+    }
+
+    int choice;
+    int id;
+    char name[50];
+    float salary;
+
+    do {
+        printf("\nEmployee Management System\n");
+        printf("1. Add Employee\n");
+        printf("2. Display Employee\n");
+        printf("3. Update Employee\n");
+        printf("4. Delete Employee\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter employee ID: ");
+                scanf("%d", &id);
+                printf("Enter employee name: ");
+                scanf("%s", name);
+                printf("Enter employee salary: ");
+                scanf("%f", &salary);
+                addEmployee(file, id, name, salary);
+                break;
+            case 2:
+                printf("Enter employee ID: ");
+                scanf("%d", &id);
+                displayEmployee(file, id);
+                break;
+            case 3:
+                printf("Enter employee ID: ");
+                scanf("%d", &id);
+                printf("Enter updated name: ");
+                scanf("%s", name);
+                printf("Enter updated salary: ");
+                scanf("%f", &salary);
+                updateEmployee(file, id, name, salary);
+                break;
+            case 4:
+                printf("Enter employee ID to delete: ");
+                scanf("%d", &id);
+                deleteEmployee(file, id);
+                break;
+            case 5:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 5);
+
+    fclose(file);
+
+    return 0;
+}
