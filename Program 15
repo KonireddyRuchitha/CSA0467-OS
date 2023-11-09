@@ -1,60 +1,87 @@
-#include<stdio.h>
-#include<stdlib.h> 
-int mutex=1,full=0,empty=3,x=0;
-int main()
-{
-    int n;
-    void producer();
-    void consumer();
-    int wait(int);
-    int signal(int);
-    printf("\n1.Producer\n2.Consumer\n3.Exit");
-    while(1)
-    {
-        printf("\nEnter your choice:");
-        scanf("%d",&n);
-        switch(n)
-        {
-            case 1:    if((mutex==1)&&(empty!=0))
-                        producer();
-                    else
-                        printf("Buffer is full!!");
-                    break;
-            case 2:    if((mutex==1)&&(full!=0))
-                        consumer();
-                    else
-                        printf("Buffer is empty!!");
-                    break;
-            case 3:
-                    exit(0);
-                    break;
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_USERS 10
+#define MAX_GROUPS 10
+#define MAX_FILES 100
+#define MAX_FILENAME_LENGTH 50
+#define MAX_PATH_LENGTH 100
+
+// Structure to represent a file
+struct File {
+    char filename[MAX_FILENAME_LENGTH];
+    int size;
+    char owner[MAX_FILENAME_LENGTH];
+    char group[MAX_FILENAME_LENGTH];
+};
+
+struct File files[MAX_FILES];
+int num_files = 0;
+
+struct User {
+    char username[MAX_FILENAME_LENGTH];
+    char directory[MAX_FILENAME_LENGTH];
+};
+
+struct User users[MAX_USERS];
+int num_users = 0;
+
+struct Group {
+    char groupname[MAX_FILENAME_LENGTH];
+    char directory[MAX_FILENAME_LENGTH];
+};
+
+struct Group groups[MAX_GROUPS];
+int num_groups = 0;
+
+// Function to create a new user
+void createUser(char *username, char *directory) {
+    if (num_users < MAX_USERS) {
+        strcpy(users[num_users].username, username);
+        strcpy(users[num_users].directory, directory);
+        num_users++;
+        printf("User '%s' created with home directory '%s'.\n", username, directory);
+    } else {
+        printf("Cannot create more users. The maximum limit has been reached.\n");
+    }
+}
+
+// Function to create a new group
+void createGroup(char *groupname, char *directory) {
+    if (num_groups < MAX_GROUPS) {
+        strcpy(groups[num_groups].groupname, groupname);
+        strcpy(groups[num_groups].directory, directory);
+        num_groups++;
+        printf("Group '%s' created with directory '%s'.\n", groupname, directory);
+    } else {
+        printf("Cannot create more groups. The maximum limit has been reached.\n");
+    }
+}
+
+// Function to create a new file
+void createFile(char *filename, int size, char *owner, char *group) {
+    if (num_files < MAX_FILES) {
+        strcpy(files[num_files].filename, filename);
+        files[num_files].size = size;
+        strcpy(files[num_files].owner, owner);
+        strcpy(files[num_files].group, group);
+        num_files++;
+        printf("File '%s' created with size %d bytes, owned by '%s', and belonging to group '%s'.\n", filename, size, owner, group);
+    } else {
+        printf("Cannot create more files. The maximum limit has been reached.\n");
+    }
+}
+
+// Function to list all files in a user's directory
+void listUserFiles(char *username) {
+    printf("Files in the directory of user '%s':\n", username);
+    for (int i = 0; i < num_files; i++) {
+        if (strcmp(files[i].owner, username) == 0) {
+            printf("%s (%d bytes, group: %s)\n", files[i].filename, files[i].size, files[i].group);
         }
-    }  
-    return 0;
+    }
 }
-int wait(int s)
-{
-    return (--s);
-}
-int signal(int s)
-{
-    return(++s);
-} 
-void producer()
-{
-    mutex=wait(mutex);
-    full=signal(full);
-    empty=wait(empty);
-    x++;
-    printf("\nProducer produces the item %d",x);
-    mutex=signal(mutex);
-} 
-void consumer()
-{
-    mutex=wait(mutex);
-    full=wait(full);
-    empty=signal(empty);
-    printf("\nConsumer consumes item %d",x);
-    x--;
-    mutex=signal(mutex);
-}
+
+// Function to list all files in a group's directory
+void listGroupFiles(char *groupname) {
+    printf("Files in
