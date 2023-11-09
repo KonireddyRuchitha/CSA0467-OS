@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_TRACKS 200
+void sortRequests(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+void scan(int requestQueue[], int n, int startTrack) {
+    int headMovement = 0;
+    int currentTrack = startTrack;
+    int direction = 1; 
+
+    sortRequests(requestQueue, n);
+    int currentIndex = 0;
+    for (int i = 0; i < n; i++) {
+        if (requestQueue[i] >= currentTrack) {
+            currentIndex = i;
+            break;
+        }
+    }
+
+    printf("Movement sequence: %d", currentTrack);
+    while (currentIndex < n) {
+        if (direction == 1) {
+            for (int i = currentIndex; i < n; i++) {
+                if (requestQueue[i] >= currentTrack) {
+                    int nextTrack = requestQueue[i];
+                    headMovement += abs(nextTrack - currentTrack);
+                    printf(" -> %d", nextTrack);
+                    currentTrack = nextTrack;
+                    currentIndex = i;
+                }
+            }
+
+            direction = -1;
+        }
+        if (currentIndex > 0) {
+            for (int i = currentIndex - 1; i >= 0; i--) {
+                if (requestQueue[i] <= currentTrack) {
+                    int nextTrack = requestQueue[i];
+                    headMovement += abs(nextTrack - currentTrack);
+                    printf(" -> %d", nextTrack);
+                    currentTrack = nextTrack;
+                    currentIndex = i;
+                }
+            }
+
+            direction = 1;
+        }
+    }
+
+    printf("\nTotal head movement: %d tracks\n", headMovement);
+}
+
+int main() {
+    int n, startTrack;
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    int requestQueue[MAX_TRACKS];
+
+    if (n <= 0 || n > MAX_TRACKS) {
+        printf("Invalid number of requests.\n");
+        return 1;
+    }
+
+    printf("Enter the request queue:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Request %d: ", i + 1);
+        scanf("%d", &requestQueue[i]);
+    }
+
+    printf("Enter the initial position of the disk head: ");
+    scanf("%d", &startTrack);
+
+    scan(requestQueue, n, startTrack);
+
+    return 0;
+}
