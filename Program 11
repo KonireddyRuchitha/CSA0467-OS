@@ -1,36 +1,19 @@
 #include<stdio.h>
-#include<conio.h>
-#include<string.h>
+#include<stdlib.h>
+#include<unistd.h>  
+#include<pthread.h>
+void *myThreadFun(void *vargp)
+{
+    sleep(1);
+    printf("Printing GeeksQuiz from Thread \n");
+    return NULL;
+} 
 int main()
 {
-	int nf=0,i=0,j=0,ch;
-	char mdname[10],fname[10][10],name[10];
-	printf("Enter the directory name:");
-	scanf("%s",mdname);
-	printf("Enter the number of files:");
-	scanf("%d",&nf);
-	do{
-		printf("Enter the name to be created:");
-		scanf("%s",name);
-		for(i=0;i<nf;i++)
-		{
-			if(!strcmp(name,fname[i]))
-			break;
-		}
-		if(i==nf)
-		{
-			strcpy(fname[j++],name);
-			nf++;
-		}
-		else
-		printf("There is already %s\n",name);
-		printf("Do you want to create another file(yes-1 or no-1):");
-		scanf("%d",&ch);
-	  }
-	    while(ch==1);
-		printf("Directory name is:%s\n",mdname);
-		printf("Files names are:");
-		for(i=0;i<j;i++)
-		printf("\n%s",fname[i]);
-		getch();
+    pthread_t thread_id;
+    printf("Before Thread\n");
+    pthread_create(&thread_id, NULL, myThreadFun, NULL);
+    pthread_join(thread_id, NULL);
+    printf("After Thread\n");
+    exit(0);
 }
