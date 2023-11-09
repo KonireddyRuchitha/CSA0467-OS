@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_TRACKS 200
+void sortRequests(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+void cscan(int requestQueue[], int n, int startTrack, int maxTrack) {
+    int headMovement = 0;
+    int currentTrack = startTrack;
+
+    sortRequests(requestQueue, n);
+    int currentIndex = 0;
+    for (int i = 0; i < n; i++) {
+        if (requestQueue[i] >= currentTrack) {
+            currentIndex = i;
+            break;
+        }
+    }
+
+    printf("Movement sequence: %d", currentTrack);
+    for (int i = currentIndex; i < n; i++) {
+        int nextTrack = requestQueue[i];
+        headMovement += abs(nextTrack - currentTrack);
+        printf(" -> %d", nextTrack);
+        currentTrack = nextTrack;
+    }
+    headMovement += abs(maxTrack - currentTrack);
+    printf(" -> %d", maxTrack);
+    currentTrack = 0;
+    for (int i = 0; i < currentIndex; i++) {
+        int nextTrack = requestQueue[i];
+        headMovement += abs(nextTrack - currentTrack);
+        printf(" -> %d", nextTrack);
+        currentTrack = nextTrack;
+    }
+
+    printf("\nTotal head movement: %d tracks\n", headMovement);
+}
+
+int main() {
+    int n, startTrack, maxTrack;
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    int requestQueue[MAX_TRACKS];
+
+    if (n <= 0 || n > MAX_TRACKS) {
+        printf("Invalid number of requests.\n");
+        return 1;
+    }
+
+    printf("Enter the request queue:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Request %d: ", i + 1);
+        scanf("%d", &requestQueue[i]);
+    }
+
+    printf("Enter the initial position of the disk head: ");
+    scanf("%d", &startTrack);
+
+    printf("Enter the maximum track number: ");
+    scanf("%d", &maxTrack);
+
+    cscan(requestQueue, n, startTrack, maxTrack);
+
+    return 0;
+}
