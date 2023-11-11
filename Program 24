@@ -1,75 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX_TRACKS 200
-void sortRequests(int arr[], int n) {
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = 0; j < n - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
-                int temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
-            }
-        }
-    }
-}
-void cscan(int requestQueue[], int n, int startTrack, int maxTrack) {
-    int headMovement = 0;
-    int currentTrack = startTrack;
-
-    sortRequests(requestQueue, n);
-    int currentIndex = 0;
-    for (int i = 0; i < n; i++) {
-        if (requestQueue[i] >= currentTrack) {
-            currentIndex = i;
-            break;
-        }
-    }
-
-    printf("Movement sequence: %d", currentTrack);
-    for (int i = currentIndex; i < n; i++) {
-        int nextTrack = requestQueue[i];
-        headMovement += abs(nextTrack - currentTrack);
-        printf(" -> %d", nextTrack);
-        currentTrack = nextTrack;
-    }
-    headMovement += abs(maxTrack - currentTrack);
-    printf(" -> %d", maxTrack);
-    currentTrack = 0;
-    for (int i = 0; i < currentIndex; i++) {
-        int nextTrack = requestQueue[i];
-        headMovement += abs(nextTrack - currentTrack);
-        printf(" -> %d", nextTrack);
-        currentTrack = nextTrack;
-    }
-
-    printf("\nTotal head movement: %d tracks\n", headMovement);
-}
+#include <fcntl.h>
+#include <unistd.h>
 
 int main() {
-    int n, startTrack, maxTrack;
-    printf("Enter the number of requests: ");
-    scanf("%d", &n);
+    int fileDescriptor;
+    ssize_t bytesRead, bytesWritten;
+    char buffer[100];
 
-    int requestQueue[MAX_TRACKS];
-
-    if (n <= 0 || n > MAX_TRACKS) {
-        printf("Invalid number of requests.\n");
-        return 1;
+    // Open a file for writing
+    fileDescriptor = open("example.txt", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (fileDescriptor == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
     }
 
-    printf("Enter the request queue:\n");
-    for (int i = 0; i < n; i++) {
-        printf("Request %d: ", i + 1);
-        scanf("%d", &requestQueue[i]);
+    // Write content to the file
+    const char* message = "Hello, UNIX System Calls!";
+    bytesWritten = write(fileDescriptor, message, strlen(message));
+    if (bytesWritten == -1) {
+        perror("write");
+        close(fileDescriptor);
+        exit(EXIT_FAILURE);
+    }
+    printf("Write Successful! %zd bytes written.\n", bytesWritten);
+
+    // Close the file
+    close(fileDescriptor);
+
+    // Open the file for reading
+    fileDescriptor = open("example.txt", O_RDONLY);
+    if (fileDescriptor == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
     }
 
-    printf("Enter the initial position of the disk head: ");
-    scanf("%d", &startTrack);
+    // Read content from the file
+    bytesRead = read(fileDescriptor, buffer, sizeof(buffer));
+    if (bytesRead == -1) {
+        perror("read");
+        close(fileDescriptor);
+        exit(EXIT_FAILURE);
+    }
+    buffer[bytesRead] = '\0'; // Null-terminate the string
+    printf("Read Successful! %zd bytes read:\n%s\n", bytesRead, buffer);
 
-    printf("Enter the maximum track number: ");
-    scanf("%d", &maxTrack);
-
-    cscan(requestQueue, n, startTrack, maxTrack);
+    // Close the file
+    close(fileDescriptor);
 
     return 0;
 }
