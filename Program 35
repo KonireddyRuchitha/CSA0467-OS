@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_BLOCKS 100
+struct File {
+    int* indexBlock;
+    int fileSize;
+};
+void initializeFile(struct File* file, int size) {
+    file->fileSize = size;
+    file->indexBlock = (int*)malloc(size * sizeof(int));
+    for (int i = 0; i < size; i++) {
+        file->indexBlock[i] = -1;
+    }
+}
+void allocateBlock(struct File* file, int blockNumber) {
+    if (blockNumber < 0 || blockNumber >= file->fileSize) {
+        printf("Invalid block number\n");
+        return;
+    }
+
+    if (file->indexBlock[blockNumber] != -1) {
+        printf("Block %d is already allocated\n", blockNumber);
+    } else {
+        file->indexBlock[blockNumber] = blockNumber;
+        printf("Allocated Block %d for the file\n", blockNumber);
+    }
+}
+void deallocateBlock(struct File* file, int blockNumber) {
+    if (blockNumber < 0 || blockNumber >= file->fileSize) {
+        printf("Invalid block number\n");
+        return;
+    }
+
+    if (file->indexBlock[blockNumber] == -1) {
+        printf("Block %d is already deallocated\n", blockNumber);
+    } else {
+        file->indexBlock[blockNumber] = -1;
+        printf("Deallocated Block %d from the file\n", blockNumber);
+    }
+}
+void displayAllocation(struct File* file) {
+    printf("File Allocation:\n");
+    for (int i = 0; i < file->fileSize; i++) {
+        printf("Block %d: %s\n", i, (file->indexBlock[i] != -1) ? "Allocated" : "Deallocated");
+    }
+}
+void cleanupFile(struct File* file) {
+    free(file->indexBlock);
+}
+
+int main() {
+    struct File myFile;
+    int fileSize = 10; 
+
+    initializeFile(&myFile, fileSize);
+
+    allocateBlock(&myFile, 2);
+    allocateBlock(&myFile, 5);
+    displayAllocation(&myFile);
+
+    deallocateBlock(&myFile, 2);
+    displayAllocation(&myFile);
+    cleanupFile(&myFile);
+
+    return 0;
+}
