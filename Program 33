@@ -1,75 +1,75 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#define MAX_FRAMES 3
-#define MAX_PAGES 10
-
-void printPageFault(int page, int frames[MAX_FRAMES]) {
-    printf("Page %d loaded into Frames: [", page);
-    for (int i = 0; i < MAX_FRAMES; ++i) {
-        printf("%d", frames[i]);
-
-        if (i < MAX_FRAMES - 1) {
-            printf(", ");
-        }
+#include<stdio.h>
+int main()
+{
+    int no_of_frames, no_of_pages, frames[10], pages[30], temp[10], flag1, flag2, flag3, i, j, k, pos, max, faults = 0;
+    printf("Enter number of frames: ");
+    scanf("%d", &no_of_frames);
+    printf("Enter number of pages: ");
+    scanf("%d", &no_of_pages);
+    printf("Enter page reference string: ");
+    for(i = 0; i < no_of_pages; ++i){
+        scanf("%d", &pages[i]);
     }
-    printf("]\n");
-}
-
-int findOptimalIndex(int pages[MAX_PAGES], int frames[MAX_FRAMES], int start) {
-    int index = -1;
-    int farthest = start;
-
-    for (int i = 0; i < MAX_FRAMES; ++i) {
-        int j;
-        for (j = start; j < MAX_PAGES; ++j) {
-            if (frames[i] == pages[j]) {
-                if (j > farthest) {
-                    farthest = j;
-                    index = i;
+    for(i = 0; i < no_of_frames; ++i){
+        frames[i] = -1;
+    }
+    for(i = 0; i < no_of_pages; ++i){
+        flag1 = flag2 = 0;
+        
+        for(j = 0; j < no_of_frames; ++j){
+            if(frames[j] == pages[i]){
+                   flag1 = flag2 = 1;
+                   break;
+               }
+        }      
+        if(flag1 == 0){
+            for(j = 0; j < no_of_frames; ++j){
+                if(frames[j] == -1){
+                    faults++;
+                    frames[j] = pages[i];
+                    flag2 = 1;
+                    break;
                 }
-                break;
-            }
+            }    
         }
-
-        // If a page will not be referenced in the future, return its index
-        if (j == MAX_PAGES) {
-            return i;
+        if(flag2 == 0){
+         flag3 =0;
+            for(j = 0; j < no_of_frames; ++j){
+             temp[j] = -1;
+            
+             for(k = i + 1; k < no_of_pages; ++k){
+             if(frames[j] == pages[k]){
+             temp[j] = k;
+             break;
+             }
+             }
+            }
+            for(j = 0; j < no_of_frames; ++j){
+             if(temp[j] == -1){
+             pos = j;
+             flag3 = 1;
+             break;
+             }
+            }
+            if(flag3 ==0){
+             max = temp[0];
+             pos = 0;
+            
+             for(j = 1; j < no_of_frames; ++j){
+             if(temp[j] > max){
+             max = temp[j];
+             pos = j;
+             }
+             }            
+            }
+frames[pos] = pages[i];
+faults++;
+        } 
+        printf("\n");
+        for(j = 0; j < no_of_frames; ++j){
+            printf("%d\t", frames[j]);
         }
     }
-
-    return index;
-}
-
-int main() {
-    int frames[MAX_FRAMES] = {-1, -1, -1};
-    int pages[MAX_PAGES] = {0, 1, 2, 3, 2, 4, 5, 3, 4, 6};
-    int pageFaults = 0;
-
-    printf("Optimal Page Replacement Simulation\n\n");
-
-    for (int i = 0; i < MAX_PAGES; ++i) {
-        int page = pages[i];
-        int pageFound = 0;
-
-        // Check if the page is already in a frame
-        for (int j = 0; j < MAX_FRAMES; ++j) {
-            if (frames[j] == page) {
-                pageFound = 1;
-                break;
-            }
-        }
-
-        // If page not found, replace the page that will not be used for the longest time
-        if (!pageFound) {
-            int optimalIndex = findOptimalIndex(pages, frames, i + 1);
-            frames[optimalIndex] = page;
-            printPageFault(page, frames);
-            pageFaults++;
-        }
-    }
-
-    printf("\nTotal Page Faults: %d\n", pageFaults);
-
+    printf("\n\nTotal Page Faults = %d", faults);
     return 0;
 }
