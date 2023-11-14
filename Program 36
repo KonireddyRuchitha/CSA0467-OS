@@ -1,80 +1,45 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-// Structure to represent a disk block
-struct DiskBlock {
-    int data;
-    struct DiskBlock* next;
-};
-
-// Structure to represent a file
-struct File {
-    struct DiskBlock* firstBlock;
-    struct DiskBlock* lastBlock;
-};
-
-// Function to initialize a file
-void initializeFile(struct File* file) {
-    file->firstBlock = NULL;
-    file->lastBlock = NULL;
+#include<conio.h>
+#include<stdlib.h>
+void main()
+{
+int f[50], p,i, st, len, j, c, k, a;
+clrscr();
+for(i=0;i<50;i++)
+f[i]=0;
+printf("Enter how many blocks already allocated: ");
+scanf("%d",&p);
+printf("Enter blocks already allocated: ");
+for(i=0;i<p;i++)
+{
+scanf("%d",&a);
+f[a]=1;
 }
-
-// Function to allocate a block for the file
-void allocateBlock(struct File* file, int data) {
-    struct DiskBlock* newBlock = (struct DiskBlock*)malloc(sizeof(struct DiskBlock));
-    newBlock->data = data;
-    newBlock->next = NULL;
-
-    if (file->firstBlock == NULL) {
-        // If the file is empty, set the new block as the first and last block
-        file->firstBlock = newBlock;
-        file->lastBlock = newBlock;
-    } else {
-        // Otherwise, add the new block to the end of the file
-        file->lastBlock->next = newBlock;
-        file->lastBlock = newBlock;
-    }
-
-    printf("Allocated Block with data %d for the file\n", data);
+x: printf("Enter index starting block and length: ");
+scanf("%d%d", &st,&len);
+k=len;
+if(f[st]==0)
+{
+for(j=st;j<(st+k);j++)
+{
+if(f[j]==0)
+{
+f[j]=1;
+printf("%d-------->%d\n",j,f[j]);
 }
-
-// Function to display the contents of the file
-void displayFile(struct File* file) {
-    printf("File Contents:\n");
-    struct DiskBlock* currentBlock = file->firstBlock;
-
-    while (currentBlock != NULL) {
-        printf("Block with data %d\n", currentBlock->data);
-        currentBlock = currentBlock->next;
-    }
+else
+{
+printf("%d Block is already allocated \n",j);
+k++;
 }
-
-// Function to free memory allocated for the file
-void cleanupFile(struct File* file) {
-    struct DiskBlock* currentBlock = file->firstBlock;
-    struct DiskBlock* nextBlock;
-
-    while (currentBlock != NULL) {
-        nextBlock = currentBlock->next;
-        free(currentBlock);
-        currentBlock = nextBlock;
-    }
 }
-
-int main() {
-    struct File myFile;
-
-    // Example: Allocate blocks for the file
-    initializeFile(&myFile);
-
-    allocateBlock(&myFile, 10);
-    allocateBlock(&myFile, 20);
-    allocateBlock(&myFile, 30);
-
-    displayFile(&myFile);
-
-    // Clean up allocated memory
-    cleanupFile(&myFile);
-
-    return 0;
+}
+else
+printf("%d starting block is already allocated \n",st);
+printf("Do you want to enter more file(Yes - 1/No - 0)");
+scanf("%d", &c);
+if(c==1)
+goto x;
+else
+exit(0);
+getch();
 }
